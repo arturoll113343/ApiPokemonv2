@@ -1,6 +1,7 @@
 package com.pokemon.pokemonApi.entity;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class Pokemon {
@@ -8,9 +9,13 @@ public class Pokemon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private int height;
     private int weight;
+
+    @OneToMany(mappedBy = "pokemon", cascade = CascadeType.ALL)
+    private List<ApiAccess> apiAccesses;
 
     // Getters y setters
 
@@ -44,5 +49,13 @@ public class Pokemon {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public List<ApiAccess> getApiAccesses() {
+        return apiAccesses;
+    }
+
+    public void setApiAccesses(List<ApiAccess> apiAccesses) {
+        this.apiAccesses = apiAccesses;
     }
 }
