@@ -1,6 +1,7 @@
 package com.pokemon.pokemonApi.service;
 
 import com.pokemon.pokemonApi.dto.PokemonDTO;
+import com.pokemon.pokemonApi.dto.EvolutionChainDTO; // Asegúrate de importar tu nuevo DTO
 import com.pokemon.pokemonApi.entity.ApiAccess;
 import com.pokemon.pokemonApi.entity.Pokemon;
 import com.pokemon.pokemonApi.repository.PokemonRepository;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public class PokemonService {
 
     private static final Logger logger = LogManager.getLogger(PokemonService.class);
-    private static final Logger auditLogger = LogManager.getLogger("AuditLogger"); // Logger de auditoría
+    private static final Logger auditLogger = LogManager.getLogger("AuditLogger");
 
     @Autowired
     private RestTemplate restTemplate;
@@ -29,33 +30,39 @@ public class PokemonService {
     private ApiAccessRepository apiAccessRepository;
 
     private final String POKE_API_URL = "https://pokeapi.co/api/v2/pokemon/";
+    private final String EVOLUTION_CHAIN_URL = "https://pokeapi.co/api/v2/evolution-chain/";
 
     public Pokemon getPokemonById(int id) {
-        logger.info("Fetching Pokémon data from PokéAPI for ID: {}", id); // Log de obtención de datos
+        logger.info("Fetching Pokémon data from PokéAPI for ID: {}", id);
 
-        // Llamada a la PokéAPI para obtener los datos del Pokémon usando el DTO
+        // Obtener datos del Pokémon
         String url = POKE_API_URL + id;
         PokemonDTO pokemonDTO = restTemplate.getForObject(url, PokemonDTO.class);
 
         if (pokemonDTO != null) {
-            // Convierte el DTO a tu entidad Pokemon
             Pokemon pokemon = mapToEntity(pokemonDTO);
 
-            // Guardar o actualizar el Pokémon en la base de datos
-            pokemonRepository.save(pokemon);
-            logger.info("Pokémon {} saved to the database", pokemon.getName()); // Log de guardado en la BD
+            // Obtener la cadena de evolución
+            EvolutionChainDTO evolutionChainDTO = getEvolutionChain(pokemon.getId());
+            if (evolutionChainDTO != null) {
+                pokemon.setEvolutionChain(evolutionChainDTO); // Asegúrate de que Pokemon tenga este método
+            }
 
-            // Registrar el acceso a la API
+            // Guardar Pokémon en la base de datos
+            pokemonRepository.save(pokemon);
+            logger.info("Pokémon {} saved to the database", pokemon.getName());
+
+            // Registrar acceso a la API
             ApiAccess apiAccess = new ApiAccess();
             apiAccess.setAccessTime(LocalDateTime.now());
             apiAccess.setPokemon(pokemon);
             apiAccessRepository.save(apiAccess);
 
-            auditLogger.info("API access logged for Pokémon ID: {}", id); // Log de auditoría
+            auditLogger.info("API access logged for Pokémon ID: {}", id);
 
             return pokemon;
         } else {
-            logger.warn("Pokémon not found on PokéAPI for ID: {}", id); // Log de Pokémon no encontrado en PokéAPI
+            logger.warn("Pokémon not found on PokéAPI for ID: {}", id);
         }
 
         return null;
@@ -69,5 +76,19 @@ public class PokemonService {
         pokemon.setWeight(pokemonDTO.getWeight());
 
         return pokemon;
+    }
+
+    // Método para obtener la cadena de evolución
+    public EvolutionChainDTO getEvolutionChain(int id) {
+        String url = EVOLUTION_CHAIN_URL + id;
+        EvolutionChainDTO evolutionChainDTO = restTemplate.getForObject(url, EvolutionChainDTO.class);
+
+        if (evolutionChainDTO != null) {
+            logger.info("Fetched evolution chain for Pokémon ID: {}", id);
+            return evolutionChainDTO;
+        } else {
+            logger.warn("Evolution chain not found for Pokémon ID: {}", id);
+            return null;
+        }
     }
 }

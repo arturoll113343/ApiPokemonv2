@@ -1,5 +1,6 @@
 package com.pokemon.pokemonApi.entity;
 
+import com.pokemon.pokemonApi.dto.EvolutionChainDTO;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -17,10 +18,14 @@ public class Pokemon {
     @OneToMany(mappedBy = "pokemon", cascade = CascadeType.ALL)
     private List<ApiAccess> apiAccesses;
 
+    // Nuevo campo para la cadena de evolución
+    @Transient // Esto indica que no se debe mapear a la base de datos
+    private EvolutionChainDTO evolutionChain;
+
     // Getters y setters
 
-    public Long getId() {
-        return id;
+    public int getId() {
+        return Math.toIntExact(id);
     }
 
     public void setId(Long id) {
@@ -57,5 +62,13 @@ public class Pokemon {
 
     public void setApiAccesses(List<ApiAccess> apiAccesses) {
         this.apiAccesses = apiAccesses;
+    }
+
+    public EvolutionChainDTO getEvolutionChain() {
+        return evolutionChain;
+    }
+
+    public void setEvolutionChain(EvolutionChainDTO evolutionChain) {
+        this.evolutionChain = evolutionChain;
     }
 }
