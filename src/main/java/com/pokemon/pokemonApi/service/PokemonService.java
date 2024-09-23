@@ -45,7 +45,7 @@ public class PokemonService {
             // Obtener la cadena de evolución
             EvolutionChainDTO evolutionChainDTO = getEvolutionChain(pokemon.getId());
             if (evolutionChainDTO != null) {
-                pokemon.setEvolutionChain(evolutionChainDTO); // Asegúrate de que Pokemon tenga este método
+                pokemon.setEvolutionChain(evolutionChainDTO); // Asegurar de que Pokemon tenga este método
             }
 
             // Guardar Pokémon en la base de datos

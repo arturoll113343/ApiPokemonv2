@@ -1,7 +1,7 @@
 package com.pokemon.pokemonApi.controller;
 
 import com.pokemon.pokemonApi.entity.Pokemon;
-import com.pokemon.pokemonApi.dto.EvolutionChainDTO; // Asegúrate de importar tu DTO de cadena de evolución
+import com.pokemon.pokemonApi.dto.EvolutionChainDTO;
 import com.pokemon.pokemonApi.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

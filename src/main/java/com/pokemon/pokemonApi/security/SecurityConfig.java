@@ -17,7 +17,7 @@ public class SecurityConfig {
                 )
                 .httpBasic(Customizer.withDefaults()); // Usar autenticación básica
 
-        // Deshabilitar CSRF solo si es necesario
+        // Deshabilitar CSRF
         http.csrf(csrf -> csrf.disable());
 
         return http.build();
